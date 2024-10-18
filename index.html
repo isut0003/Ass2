@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webpage with 5 Sections</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Linking to the external CSS file -->
+
+    <!-- Vega-Lite & Vega Embed Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+
+<body>
+
+    <!-- Section 1 -->
+    <div class="section section1">
+        <div class="section-content">
+            <h2 class="tech-news">AUSTRALIA NEWS</h2>
+            <hr class="divider">
+            <h3 class="breaking-news">BREAKING NEWS</h3>
+            <h1 class="headline">Have Female Treated Equally <br> And Feeling Safe ?</h1>
+        </div>
+    </div>
+
+    <!-- Section 2 -->
+
+    <div class="section section2">
+        <div class="map-region-container">
+            <div class="map-container">
+                <div id="map" class="map"></div> <!-- Map is contained within the map-container -->
+            </div>
+            <!-- Region Selection Buttons -->
+            <div class="region-buttons">
+                <button class="region-btn" data-region="World">World</button>
+                <button class="region-btn" data-region="Africa">Africa</button>
+                <button class="region-btn" data-region="Asia">Asia</button>
+                <button class="region-btn" data-region="Europe">Europe</button>
+                <button class="region-btn" data-region="North America">North America</button>
+                <button class="region-btn" data-region="Oceania">Oceania</button>
+                <button class="region-btn" data-region="South America">South America</button>
+            </div>
+        </div>
+
+        <!-- Explanation Section -->
+        <div class="explanation-container">
+            <h2>Explanation of the Map</h2>
+            <p>
+                This map shows the female population ratio across various regions of the world from 1960 to 2022.
+                You can use the year selection slider to explore the changes over time. The regions are color-coded
+                based on
+                the percentage of the population that is female. The darker colors indicate a higher percentage of
+                females in the population.
+            </p>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // Define the base specification for the map
+        let spec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "title": {
+                "text": "Female Population Ratio by Country (1960-2022)",
+                "font": "Georgia",         // Specify the font you want
+                "fontSize": 20,            // Adjust the font size
+                "fontWeight": "bold",      // Optional: Set the weight to bold
+                "anchor": "start",         // Optional: Align to the start, center, or end
+                "color": "#4F4F4F",
+                "dy": -10
+                // Optional: Set the color
+            },
+            "width": 700,
+            "height": 400,
+            "projection": {
+                "type": "equalEarth"
+            },
+            "params": [
+                {
+                    "name": "YearSelection",
+                    "value": 2022,
+                    "bind": {
+                        "input": "range",
+                        "min": 1960,
+                        "max": 2022,
+                        "step": 1,
+                        "name": "Year Selection: "
+                    }
+                }
+            ],
+            "data": {
+                "url": "https://raw.githubusercontent.com/isut0003/3179/refs/heads/main/female_population.csv",
+                "format": { "type": "csv" }
+            },
+            "transform": [
+                {
+                    "filter": "datum.Year == YearSelection"
+                },
+                {
+                    "lookup": "Country",
+                    "from": {
+                        "data": {
+                            "url": "https://raw.githubusercontent.com/isut0003/3179/refs/heads/main/ne_110m-2.topojson",
+                            "format": {
+                                "type": "topojson",
+                                "feature": "ne_110m_admin_0_countries"
+                            }
+                        },
+                        "key": "properties.GU_A3",
+                        "fields": ["type", "properties", "geometry"]
+                    }
+                },
+                {
+                    "calculate": "datum['Population Female'] <= 46 ? '<= 46%' : datum['Population Female'] > 46 && datum['Population Female'] <= 50 ? '46-50%' : datum['Population Female'] > 50 && datum['Population Female'] <= 52 ? '50-52%' : datum['Population Female'] > 52 && datum['Population Female'] <= 54 ? '52-54%' : '> 54%'",
+                    "as": "PopulationBin"
+                }
+            ],
+            "layer": [
+                {
+                    "data": {
+                        "url": "https://raw.githubusercontent.com/isut0003/3179/refs/heads/main/oceans.topojson",
+                        "format": {
+                            "type": "topojson",
+                            "feature": "oceans"
+                        }
+                    },
+                    "mark": {
+                        "type": "geoshape",
+                        "fill": "#92B7C7",
+                        "stroke": null
+                    }
+                },
+                {
+                    "mark": {
+                        "type": "geoshape",
+                        "stroke": "black",
+                        "strokeWidth": 0.5
+                    },
+                    "encoding": {
+                        "color": {
+                            "field": "PopulationBin",
+                            "type": "nominal",
+                            "scale": {
+                                "domain": ["<= 46%", "46-50%", "50-52%", "52-54%", "> 54%"],
+                                "range": ["#2A3B60", "#4A617D", "#EDE2D0", "#8B1A1A", "#C94C4C"]
+                            },
+                            "legend": {
+                                "title": "Female Population (%)"
+                            }
+                        },
+                        "tooltip": [
+                            {
+                                "field": "properties.NAME",
+                                "type": "nominal",
+                                "title": "Country"
+                            },
+                            {
+                                "field": "Population Female",
+                                "type": "quantitative",
+                                "title": "Female Population (%)"
+                            },
+                            {
+                                "field": "Year",
+                                "type": "ordinal",
+                                "title": "Year"
+                            }
+                        ]
+                    }
+                }
+            ]
+        };
+
+        // Function to update the map with a zoomed-in region
+        function updateMap(region) {
+            const projections = {
+                "World": { "type": "equalEarth" },
+                "Africa": { "type": "equalEarth", "center": [20, 10], "scale": 300 },
+                "Asia": { "type": "equalEarth", "center": [90, 20], "scale": 300 },
+                "Europe": { "type": "equalEarth", "center": [15, 60], "scale": 750 },
+                "North America": { "type": "equalEarth", "center": [-100, 40], "scale": 300 },
+                "Oceania": { "type": "equalEarth", "center": [140, -25], "scale": 300 },
+                "South America": { "type": "equalEarth", "center": [-60, -15], "scale": 300 }
+            };
+
+            // Set the projection based on the selected region
+            if (region in projections) {
+                spec.projection = projections[region];
+            } else {
+                spec.projection = { "type": "equalEarth" }; // Default to world view
+            }
+
+            // Re-render the map
+            vegaEmbed('#map', spec).then(result => { }).catch(console.error);
+        }
+
+        // Event listener for the region buttons
+        document.querySelectorAll('.region-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const selectedRegion = this.getAttribute('data-region');
+                updateMap(selectedRegion);
+            });
+        });
+
+        // Initially render the world view
+        updateMap('World');
+    </script>
+
+    <!-- Section 3: Labour Force Participation Section -->
+    <div class="section section3">
+        <div class="inner-container">
+            <h1>Female Employability in Australia</h1>
+
+            <!-- Labor Force Participation Graphs (Each in its own card) -->
+            <!-- Labor Force Participation Graphs (Each in its own card) -->
+            <div class="card">
+                <div class="card-body">
+                    <div id="graphs"></div> <!-- Line charts will be here -->
+                </div>
+            </div>
+
+            <!-- Explanation Text (Separate Card) -->
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-content">
+                        The graphs above show the Labor Force Participation Rate by Sex for Australia, East Asia &
+                        Pacific,
+                        High Income countries, and the World. These visualizations help us understand the trends in
+                        female
+                        employability across different regions and how Australia compares to global averages.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Bubble Plot (Same Layout as Above) -->
+            <h1>Female Employability in Australia</h1>
+            <div class="card">
+                <div class="card-body">
+                    <div id="bubblePlot"></div> <!-- Bubble plot will be here -->
+                </div>
+            </div>
+
+            <!-- Explanation Text for Bubble Plot (Separate Card) -->
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-content">
+                        The above bubble plot visualizes Female Labor Force Participation vs. Unpaid Domestic Work for
+                        different countries. The bubble size represents the Happiness Score, categorized into Low,
+                        Medium, and High. This visualization helps highlight the relationship between labor force
+                        participation and the burden of unpaid work across various countries, including Australia.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Employment Ratio Map and Weekly Earnings Donut Chart side by side -->
+            <div class="grid">
+                <!-- Employment Ratio Map -->
+                <div class="card">
+                    <div class="card-body">
+                        <div id="map2"></div> <!-- Map will be here -->
+                    </div>
+                </div>
+                <!-- Weekly Earnings Donut Chart -->
+                <div class="card">
+                    <div class="card-body">
+                        <div id="weeklygap"></div> <!-- Donut chart will be here -->
+                        <div style="text-align: center; margin-bottom: 1rem;">
+                            <button id="resetButton" class="reset-button">Reset to Initial Chart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Text Container 1 -->
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-content">
+                        The map and chart side by side provide a detailed look at the employment ratio for females
+                        across different Australian states. The employment rate can be explored for various years,
+                        highlighting trends and comparing them with the overall average weekly earnings for males and
+                        females across Australia.
+                    </p>
+                </div>
+            </div>
+
+        
+
+        </div>
+    </div>
+
+    <script>
+
+        const bubblePlotSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "title": {
+                "text": "Female Labor Force Participation vs. Unpaid Domestic Work",
+                "fontSize": 18,
+                "font": "sans-serif",
+                "color": "#333",
+                "anchor": "middle",
+                "offset": 10
+            },
+            "width": 600,
+            "height": 600,
+            "data": {
+                "url": "https://raw.githubusercontent.com/isut0003/3179/refs/heads/main/unpaidwork.csv",
+                "format": { "type": "csv" }
+            },
+            "transform": [
+                {
+                    "calculate": "datum['Happiness Score'] < 4 ? 'Low' : datum['Happiness Score'] < 6 ? 'Medium' : 'High'",
+                    "as": "Happiness Category"
+                }
+            ],
+            "layer": [
+                {
+                    "mark": {
+                        "type": "point",
+                        "filled": true
+                    },
+                    "encoding": {
+                        "x": {
+                            "field": "Ratio Female to Male unpaid",
+                            "type": "quantitative",
+                            "title": "Ratio of Female-to-Male Unpaid Domestic Work",
+                            "scale": { "domain": [0, 13] },
+                            "axis": { "tickMinStep": 1 }
+                        },
+                        "y": {
+                            "field": "Female Participation",
+                            "type": "quantitative",
+                            "title": "Female Labor Force Participation (%)",
+                            "scale": { "domain": [0, 90] },
+                            "axis": { "labelOverlap": "false" }
+                        },
+                        "size": {
+                            "field": "Happiness Category",
+                            "type": "nominal",
+                            "title": "Happiness Category",
+                            "scale": {
+                                "domain": ["Low", "Medium", "High"],
+                                "range": [50, 200, 400]
+                            }
+                        },
+                        "color": {
+                            "field": "Happiness Category",
+                            "type": "nominal",
+                            "title": "Happiness Category",
+                            "scale": {
+                                "domain": ["Low", "Medium", "High"],
+                                "range": ["#66c2a5", "#fc8d62", "#8da0cb"]
+                            }
+                        },
+                        "stroke": {
+                            "condition": { "test": "datum.Country === 'Australia'", "value": "black" },
+                            "value": null
+                        },
+                        "tooltip": [
+                            { "field": "Country", "type": "nominal", "title": "Country" },
+                            { "field": "Female Participation", "type": "quantitative", "title": "Female Participation (%)" },
+                            { "field": "Ratio Female to Male unpaid", "type": "quantitative", "title": "Ratio of Unpaid Domestic Work" },
+                            { "field": "Happiness Score", "type": "quantitative", "title": "Happiness Score" }
+                        ]
+                    }
+                },
+                {
+                    "mark": { "type": "line", "color": "black", "opacity": 0.5 },
+                    "transform": [
+                        { "regression": "Female Participation", "on": "Ratio Female to Male unpaid", "extent": [0, 13] }
+                    ],
+                    "encoding": {
+                        "x": {
+                            "field": "Ratio Female to Male unpaid",
+                            "type": "quantitative",
+                            "title": "Ratio of Female-to-Male Unpaid Domestic Work"
+                        },
+                        "y": {
+                            "field": "Female Participation",
+                            "type": "quantitative",
+                            "title": "Female Labor Force Participation (%)"
+                        }
+                    }
+                }
+            ]
+        };
+        const graphsSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "title": {
+                "text": "Labor Force Participation Rate by Sex (% of population 15+)",
+                "font": "sans-serif"
+            },
+            "vconcat": [
+                {
+                    "hconcat": [
+                        {
+                            "title": "Australia",
+                            "width": 250,
+                            "height": 200,
+                            "data": {
+                                "url": "https://raw.githubusercontent.com/isut0003/3179/refs/heads/main/labourparticipation.csv",
+                                "format": { "type": "csv" }
+                            },
+                            "transform": [{ "filter": "datum.Country == 'Australia'" }],
+                            "mark": "line",
+                            "encoding": {
+                                "x": {
+                                    "field": "Year",
+                                    "type": "ordinal",
+                                    "title": "Year",
+                                    "axis": { "labelAngle": 0 }
+                                },
+                                "y": {
+                                    "field": "Rate",
+                                    "type": "quantitative",
+                                    "title": "Participation Rate (%)",
+                                    "scale": { "domain": [0, 100] }
+                                },
+                                "color": {
+                                    "field": "Gender",
+                                    "type": "nominal",
+                                    "scale": {
+                                        "domain": ["Female", "Male"],
+                                        "range": ["#FFA500", "#800080"]
+                                    },
+                                    "title": "Sex"
+                                },
+                                "tooltip": [
+                                    { "field": "Year", "type": "ordinal", "title": "Year" },
+                                    { "field": "Gender", "type": "nominal", "title": "Gender" },
+                                    { "field": "Rate", "type": "quantitative", "title": "Rate (%)", "format": ".1f" }
+                                ]
+                            }
+                        },
+                        {
+                            "title": "East Asia & Pacific",
+                            "width": 250,
+                            "height": 200,
+                            "data": {
+                                "url": "https://raw.githubusercontent.com/isut0003/3179/refs/heads/main/labourparticipation.csv",
+                                "format": { "type": "csv" }
+                            },
+                            "transform": [{ "filter": "datum.Country == 'East Asia & Pacific'" }],
+                            "mark": "line",
+                            "encoding": {
+                                "x": {
+                                    "field": "Year",
+                                    "type": "ordinal",
+                                    "title": "Year",
+                                    "axis": { "labelAngle": 0 }
+                                },
+                                "y": {
+                                    "field": "Rate",
+                                    "type": "quantitative",
+                                    "title": "Participation Rate (%)",
+                                    "scale": { "domain": [0, 100] }
+                                },
+                                "color": {
+                                    "field": "Gender",
+                                    "type": "nominal",
+                                    "scale": {
+                                        "domain": ["Female", "Male"],
+                                        "range": ["#FFA500", "#800080"]
+                                    },
+                                    "title": "Sex"
+                                },
+                                "tooltip": [
+                                    { "field": "Year", "type": "ordinal", "title": "Year" },
+                                    { "field": "Gender", "type": "nominal", "title": "Gender" },
+                                    { "field": "Rate", "type": "quantitative", "title": "Rate (%)", "format": ".1f" }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "hconcat": [
+                        {
+                            "title": "High Income",
+                            "width": 250,
+                            "height": 200,
+                            "data": {
+                                "url": "https://raw.githubusercontent.com/isut0003/3179/refs/heads/main/labourparticipation.csv",
+                                "format": { "type": "csv" }
+                            },
+                            "transform": [{ "filter": "datum.Country == 'High Income'" }],
+                            "mark": "line",
+                            "encoding": {
+                                "x": {
+                                    "field": "Year",
+                                    "type": "ordinal",
+                                    "title": "Year",
+                                    "axis": { "labelAngle": 0 }
+                                },
+                                "y": {
+                                    "field": "Rate",
+                                    "type": "quantitative",
+                                    "title": "Participation Rate (%)",
+                                    "scale": { "domain": [0, 100] }
+                                },
+                                "color": {
+                                    "field": "Gender",
+                                    "type": "nominal",
+                                    "scale": {
+                                        "domain": ["Female", "Male"],
+                                        "range": ["#FFA500", "#800080"]
+                                    },
+                                    "title": "Sex"
+                                },
+                                "tooltip": [
+                                    { "field": "Year", "type": "ordinal", "title": "Year" },
+                                    { "field": "Gender", "type": "nominal", "title": "Gender" },
+                                    { "field": "Rate", "type": "quantitative", "title": "Rate (%)", "format": ".1f" }
+                                ]
+                            }
+                        },
+                        {
+                            "title": "World",
+                            "width": 250,
+                            "height": 200,
+                            "data": {
+                                "url": "https://raw.githubusercontent.com/isut0003/3179/refs/heads/main/labourparticipation.csv",
+                                "format": { "type": "csv" }
+                            },
+                            "transform": [{ "filter": "datum.Country == 'World'" }],
+                            "mark": "line",
+                            "encoding": {
+                                "x": {
+                                    "field": "Year",
+                                    "type": "ordinal",
+                                    "title": "Year",
+                                    "axis": { "labelAngle": 0 }
+                                },
+                                "y": {
+                                    "field": "Rate",
+                                    "type": "quantitative",
+                                    "title": "Participation Rate (%)",
+                                    "scale": { "domain": [0, 100] }
+                                },
+                                "color": {
+                                    "field": "Gender",
+                                    "type": "nominal",
+                                    "scale": {
+                                        "domain": ["Female", "Male"],
+                                        "range": ["#FFA500", "#800080"]
+                                    },
+                                    "title": "Sex"
+                                },
+                                "tooltip": [
+                                    { "field": "Year", "type": "ordinal", "title": "Year" },
+                                    { "field": "Gender", "type": "nominal", "title": "Gender" },
+                                    { "field": "Rate", "type": "quantitative", "title": "Rate (%)", "format": ".1f" }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ],
+            "config": {
+                "background": "white",
+                "axis": {
+                    "labelFont": "sans-serif",
+                    "titleFont": "sans-serif"
+                }
+            }
+        };
+
+        const map2Spec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "width": 300,
+            "height": 350,
+            "title": {
+                "text": "Female Employment to Population Ratio in Australian States",
+                "fontSize": 15,
+                "font": "sans-serif",
+                "color": "#333",
+                "anchor": "middle",
+                "offset": 20
+            },
+            "params": [
+                {
+                    "name": "YearSelection",
+                    "value": 1988,
+                    "bind": {
+                        "input": "range",
+                        "min": 1988,
+                        "max": 2024,
+                        "step": 4,
+                        "name": "Year Selection: "
+                    }
+                },
+                {
+                    "name": "selectedState",
+                    "select": { "type": "point", "fields": ["State"] },
+                    "bind": "scales"
+                }
+            ],
+            "data": {
+                "url": "https://raw.githubusercontent.com/isut0003/3179/refs/heads/main/Employment%20Population%20Female%20by%20year.csv",
+                "format": { "type": "csv" }
+            },
+            "transform": [
+                {
+                    "filter": "datum.Year == YearSelection"
+                },
+                {
+                    "lookup": "State",
+                    "from": {
+                        "data": {
+                            "url": "https://raw.githubusercontent.com/isut0003/3179/main/ne_50m-2.topojson",
+                            "format": {
+                                "type": "topojson",
+                                "feature": "ne_50m_admin_1_states_provinces"
+                            }
+                        },
+                        "key": "properties.name",
+                        "fields": ["type", "properties", "geometry"]
+                    }
+                }
+            ],
+            "projection": {
+                "type": "mercator"
+            },
+            "mark": {
+                "type": "geoshape",
+                "stroke": "white"
+            },
+            "encoding": {
+                "color": {
+                    "field": "Ratio",
+                    "type": "quantitative",
+                    "title": "Employment Ratio (%)",
+                    "scale": {
+                        "range": ["#FFCC80", "#FF5722"],
+                        "domain": [30, 70]
+                    }
+                },
+                "tooltip": [
+                    { "field": "State", "type": "nominal", "title": "State" },
+                    { "field": "Ratio", "type": "quantitative", "format": ".1f", "title": "Employment Ratio (%)" },
+                    { "field": "Year", "type": "quantitative", "title": "Year" }
+                ]
+            },
+            "config": {
+                "background": "white",
+                "view": { "stroke": "transparent" }
+            }
+        };
+
+        const weeklygapSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "title": {
+                "text": "Average Weekly Earnings by Gender",
+                "fontSize": 18,
+                "font": "sans-serif",
+                "color": "#333",
+                "anchor": "middle",
+                "offset": 10
+            },
+            "width": 300,
+            "height": 300,
+            "data": {
+                "url": "https://raw.githubusercontent.com/isut0003/3179/refs/heads/main/averageweekstate.csv",
+                "format": { "type": "csv" }
+            },
+            "transform": [
+                {
+                    "filter": "selectedState == null || datum.State == selectedState"
+                }
+            ],
+            "mark": {
+                "type": "arc",
+                "innerRadius": 60,
+                "stroke": "#fff"
+            },
+            "encoding": {
+                "theta": { "field": "Earning", "type": "quantitative", "title": "Earning (AUD)" },
+                "color": {
+                    "field": "Gender",
+                    "type": "nominal",
+                    "scale": {
+                        "domain": ["Male", "Female"],
+                        "range": ["#FF5722", "#FFA500"]
+                    },
+                    "title": "Gender"
+                },
+                "tooltip": [
+                    { "field": "State", "type": "nominal", "title": "State" },
+                    { "field": "Gender", "type": "nominal", "title": "Gender" },
+                    { "field": "Earning", "type": "quantitative", "title": "Weekly Earning (AUD)", "format": ".2f" }
+                ]
+            },
+            "config": {
+                "background": "white",
+                "view": { "stroke": "transparent" }
+            }
+        }
+
+        const initialChartSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "width": 400,
+            "height": 300,
+            "title": {
+                "text": "Average Weekly Earnings in Australia (1995-2024)",
+                "font": "sans-serif"
+            },
+            "data": {
+                "url": "https://raw.githubusercontent.com/isut0003/3179/refs/heads/main/average%20weekly%20earning.csv",
+                "format": { "type": "csv" }
+            },
+            "transform": [
+                {
+                    "fold": ["Male Weekly Earning", "Female Weekly Earning"],
+                    "as": ["Gender", "Weekly Earning"]
+                },
+                {
+                    "calculate": "datum['Male Weekly Earning'] - datum['Female Weekly Earning']",
+                    "as": "Gap"
+                }
+            ],
+            "layer": [
+                {
+                    "mark": "area",
+                    "encoding": {
+                        "x": {
+                            "field": "Year",
+                            "type": "ordinal",
+                            "title": "Year",
+                            "axis": {
+                                "labelAngle": 0,
+                                "values": ["1995", "2000", "2005", "2010", "2015", "2020", "2024"]
+                            }
+                        },
+                        "y": {
+                            "field": "Female Weekly Earning",
+                            "type": "quantitative",
+                            "title": "Weekly Earning (AUD)"
+                        },
+                        "y2": {
+                            "field": "Male Weekly Earning"
+                        },
+                        "color": {
+                            "value": "#ffcc80"
+                        },
+                        "opacity": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                {
+                    "mark": "line",
+                    "encoding": {
+                        "x": {
+                            "field": "Year",
+                            "type": "ordinal"
+                        },
+                        "y": {
+                            "field": "Male Weekly Earning",
+                            "type": "quantitative"
+                        },
+                        "color": {
+                            "value": "#1f91a3"
+                        },
+                        "tooltip": [
+                            { "field": "Year", "type": "ordinal", "title": "Year" },
+                            {
+                                "field": "Male Weekly Earning",
+                                "type": "quantitative",
+                                "title": "Male Weekly Earning (AUD)",
+                                "format": ".2f"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "mark": "line",
+                    "encoding": {
+                        "x": {
+                            "field": "Year",
+                            "type": "ordinal"
+                        },
+                        "y": {
+                            "field": "Female Weekly Earning",
+                            "type": "quantitative"
+                        },
+                        "color": {
+                            "value": "#ff7f0e"
+                        },
+                        "tooltip": [
+                            { "field": "Year", "type": "ordinal", "title": "Year" },
+                            {
+                                "field": "Female Weekly Earning",
+                                "type": "quantitative",
+                                "title": "Female Weekly Earning (AUD)",
+                                "format": ".2f"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "mark": {
+                        "type": "rule",
+                        "color": "red",
+                        "strokeWidth": 2,
+                        "strokeDash": [4, 4],
+                        "opacity": 0.6
+                    },
+                    "encoding": {
+                        "x": {
+                            "datum": "2012",
+                            "type": "ordinal"
+                        },
+                        "tooltip": [
+                            {
+                                "value": "Highest Pay Gap in 2012: 484.3 AUD"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "mark": {
+                        "type": "point",
+                        "tooltip": true,
+                        "filled": true,
+                        "size": 50
+                    },
+                    "encoding": {
+                        "x": {
+                            "field": "Year",
+                            "type": "ordinal"
+                        },
+                        "y": {
+                            "field": "Male Weekly Earning",
+                            "type": "quantitative"
+                        },
+                        "color": {
+                            "value": "#1f91a3"
+                        }
+                    }
+                },
+                {
+                    "mark": {
+                        "type": "point",
+                        "tooltip": true,
+                        "filled": true,
+                        "size": 50
+                    },
+                    "encoding": {
+                        "x": {
+                            "field": "Year",
+                            "type": "ordinal"
+                        },
+                        "y": {
+                            "field": "Female Weekly Earning",
+                            "type": "quantitative"
+                        },
+                        "color": {
+                            "value": "#ff7f0e"
+                        }
+                    }
+                }
+            ],
+            "config": {
+                "background": "white",
+                "axis": {
+                    "labelFont": "sans-serif",
+                    "titleFont": "sans-serif"
+                }
+            }
+        };
+
+
+
+        vegaEmbed('#graphs', graphsSpec);
+        vegaEmbed('#bubblePlot', bubblePlotSpec);
+        vegaEmbed('#weeklygap', initialChartSpec);
+        // Add event listener to the Reset button
+        document.getElementById('resetButton').addEventListener('click', function () {
+            // Re-embed the initial chart
+            vegaEmbed('#weeklygap', initialChartSpec);
+        });
+
+        // Embed the map and set up the click event for the states
+        vegaEmbed('#map2', map2Spec).then(function (result) {
+            result.view.addEventListener('click', function (event, item) {
+                if (item && item.datum && item.datum.State) {
+                    // Update the donut chart to show data for the selected state
+                    weeklygapSpec.transform[0].filter = `datum.State == '${item.datum.State}'`;
+                    vegaEmbed('#weeklygap', weeklygapSpec);
+                }
+            });
+        });
+
+
+    </script>
+
+
+<!-- Section 4: Sexual Assaults and Feeling Rushed Section -->
+<div class="section section4">
+    <div class="inner-container">
+        <h1>Sexual Assaults and Feeling Rushed in Australia</h1>
+
+        <!-- Sexual Assaults Chart (Card) -->
+        <div class="card">
+            <div class="card-body">
+                <div id="assaultChart"></div> <!-- Sexual Assaults by Gender and State chart will be here -->
+            </div>
+        </div>
+
+        <!-- Explanation Text for Sexual Assaults Chart (Separate Card) -->
+        <div class="card">
+            <div class="card-body">
+                <p class="text-content">
+                    The chart above shows the percentage distribution of sexual assaults by gender across various states in Australia. This visualization highlights the disparities in reported cases involving males and females across the states.
+                </p>
+            </div>
+        </div>
+
+        <!-- Feeling Rushed Chart (Card) -->
+        <div class="card">
+            <div class="card-body">
+                <div id="feelingRushedChart"></div> <!-- Feeling Rushed by Age Group and Gender chart will be here -->
+            </div>
+        </div>
+
+        <!-- Explanation Text for Feeling Rushed Chart (Separate Card) -->
+        <div class="card">
+            <div class="card-body">
+                <p class="text-content">
+                    The chart above visualizes the percentage of males and females feeling rushed, categorized by age group. This helps us understand the distribution of stress across different age demographics and gender groups.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+const assaultSpec = {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "title": {
+                "text": "Sexual Assaults by Gender and State",
+                "fontSize": 18,
+                "font": "sans-serif",
+                "color": "#333",
+                "anchor": "middle",
+                "offset": 10
+            },
+            "width": 500,
+            "height": 300,
+            "data": {
+                "url": "https://raw.githubusercontent.com/isut0003/3179/refs/heads/main/Female%20Assault.csv",
+                "format": { "type": "csv" }
+            },
+            "mark": {
+                "type": "bar"
+            },
+            "encoding": {
+                "y": {
+                    "field": "State",
+                    "type": "nominal",
+                    "title": "State",
+                    "sort": "ascending"
+                },
+                "x": {
+                    "field": "Estimate",
+                    "type": "quantitative",
+                    "stack": "normalize",
+                    "title": "Percentage of Assaults (%)",
+                    "axis": {
+                        "format": "0%",
+                        "labelAngle": 0
+                    }
+                },
+                "color": {
+                    "field": "Gender",
+                    "type": "nominal",
+                    "title": "Gender",
+                    "scale": {
+                        "domain": ["Male", "Female"],
+                        "range": ["#1f77b4", "#ff7f0e"]
+                    }
+                },
+                "tooltip": [
+                    { "field": "State", "type": "nominal", "title": "State" },
+                    { "field": "Gender", "type": "nominal", "title": "Gender" },
+                    { "field": "Estimate", "type": "quantitative", "title": "Percentage of Assaults (%)", "format": ".2f" }
+                ]
+            }
+    };
+
+    const feelingRushedSpec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Feeling Rushed by Age Group and Gender",
+    "fontSize": 18,
+    "font": "sans-serif",
+    "color": "#333",
+    "anchor": "middle",
+    "offset": 10
+  },
+  "width": 400,
+  "height": 300,
+  "data": {
+    "url": "https://raw.githubusercontent.com/isut0003/3179/refs/heads/main/Feelingrushed.csv",
+    "format": { "type": "csv" }
+  },
+  "transform": [
+    {
+      "fold": ["Male Percentage", "Female Percentage"],
+      "as": ["Gender", "Percentage"]
+    },
+    {
+      "calculate": "datum.Gender == 'Male Percentage' ? -datum.Percentage : datum.Percentage",
+      "as": "Adjusted Percentage"
+    }
+  ],
+  "mark": "bar",
+  "encoding": {
+    "y": {
+      "field": "Age group",
+      "type": "nominal",
+      "title": "Age Group",
+      "sort": "ascending"
+    },
+    "x": {
+      "field": "Adjusted Percentage",
+      "type": "quantitative",
+      "title": "Male (%), Female (%)",
+      "axis": {
+        "format": ".1f",
+        "labelExpr": "datum.value < 0 ? format(-datum.value, '.1f') : format(datum.value, '.1f')"
+      }
+    },
+    "color": {
+      "field": "Gender",
+      "type": "nominal",
+      "scale": {
+        "domain": ["Male Percentage", "Female Percentage"],
+        "range": ["#8da0cb", "#fc8d62"]
+      },
+      "title": "Gender"
+    },
+    "tooltip": [
+      { "field": "Age group", "type": "nominal", "title": "Age Group" },
+      { "field": "Gender", "type": "nominal", "title": "Gender" },
+      { "field": "Percentage", "type": "quantitative", "title": "Percentage (%)", "format": ".1f" }
+    ]
+  }
+};
+
+
+    // Embed the Vega-Lite specifications for Section 4 charts
+    vegaEmbed('#assaultChart', assaultSpec);
+    vegaEmbed('#feelingRushedChart', feelingRushedSpec);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Section 5 -->
+    <div class="section section5">
+        <h1>Section 5</h1>
+    </div>
+
+
+
+</body>
+
+</html>

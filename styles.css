@@ -1,0 +1,417 @@
+/* General body styling */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Section styling */
+.section {
+    width: 80vmax; /* Width set to 80vmax */
+    margin: 0 auto; /* Centers the section horizontally */
+    height: 100vh; /* Full viewport height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    text-align: center;
+}
+
+/* Section 1 */
+.section1 {
+    background-color: #f2ebdf;
+    height: 30vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.section1 .tech-news {
+    font-family: 'Georgia', serif;
+    font-size: 24px;
+    letter-spacing: 2px;
+    color: #333333;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.section1 .divider {
+    border: none;
+    height: 1px;
+    width: 100%;
+    max-width: 1200px;
+    background-color: #333333;
+    margin: 10px 0;
+}
+
+.section1 .breaking-news {
+    font-family: 'Helvetica', sans-serif;
+    font-weight: bold;
+    color: #b81f24;
+    font-size: 18px;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.section1 .headline {
+    font-family: 'Georgia', serif;
+    font-size: 40px;
+    line-height: 1.2;
+    color: #333333;
+    font-weight: bold;
+    margin: 0;
+}
+
+
+/* Section styling */
+.section {
+    width: 80vmax;
+    margin: 0 auto;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    text-align: center;
+}
+
+/* Section 1 */
+.section1 {
+    background-color: #f2ebdf;
+    height: 30vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.section1 .tech-news {
+    font-family: 'Georgia', serif;
+    font-size: 24px;
+    letter-spacing: 2px;
+    color: #333333;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.section1 .divider {
+    border: none;
+    height: 1px;
+    width: 100%;
+    max-width: 1200px;
+    background-color: #333333;
+    margin: 10px 0;
+}
+
+.section1 .breaking-news {
+    font-family: 'Helvetica', sans-serif;
+    font-weight: bold;
+    color: #b81f24;
+    font-size: 18px;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.section1 .headline {
+    font-family: 'Georgia', serif;
+    font-size: 40px;
+    line-height: 1.2;
+    color: #333333;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Section 2 (Map) */
+.section2 {
+    background-color: #ead9bc;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 85vh;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+/* Map and region button container */
+.map-region-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+}
+
+/* Map container */
+.map-container {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 70%;
+    max-width: 1000px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Map styling */
+.map {
+    width: 100%;
+    border-radius: 10px;
+    background-color: white;
+    overflow: hidden;
+}
+
+/* Region button container */
+.region-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-left: 20px;
+    height: auto;
+    width: 150px;
+}
+
+/* Style for region buttons */
+.region-btn {
+    background-color: #2A3B60;
+    color: white;
+    border: none;
+    padding: 22px 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.region-btn:hover {
+    background-color: #4A617D;
+}
+
+.region-btn.active {
+    background-color: #8B1A1A;
+}
+
+/* Explanation container styling */
+.explanation-container {
+    width: 100%;
+    max-width: 1150px;
+    background-color: #fff;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.explanation-container h2 {
+    font-family: 'Georgia', serif;
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.explanation-container p {
+    font-family: 'Arial', sans-serif;
+    color: #555;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Style the year selection slider */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 70%;
+    height: 6px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+    opacity: 0.9;
+    transition: opacity 0.3s;
+    margin-left: 20px;
+}
+
+input[type="range"]:hover {
+    opacity: 1;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #2A3B60;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #2A3B60;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Add label styles for Year Selection */
+label {
+    font-family: 'Georgia', serif;
+    font-size: 20px;
+    color: #333333;
+    margin-right: 10px;
+}
+
+
+
+/* Main section styling */
+.section3 {
+    height: auto;
+    margin: 0 auto;
+    background-color:  #f2ebdf;
+    padding-bottom: 2rem; /* Add some padding at the bottom */
+}
+
+/* Constrain the content width */
+.section3 .inner-container {
+    max-width: 80vmax; /* Limit the content width */
+    margin: 0 auto; /* Center the content */
+}
+
+/* Styling for the title */
+h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #111827;
+    margin-bottom: 2rem;
+    text-align: center; /* Center the title */
+}
+
+/* Card styling (individual cards for each section) */
+.card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    display: block;
+    width: 100%; /* Full-width within container */
+    max-width: 80vmax; /* Limit the card width for consistency */
+    margin-left: auto; /* Center the cards */
+    margin-right: auto; /* Center the cards */
+}
+
+.card-body {
+    padding: 1.5rem;
+    display: block; /* Ensure block display for individual elements */
+    width: 100%;
+    height: auto;
+}
+
+/* Text content styling */
+.text-content {
+    color: #4b5563;
+    font-size: 1.125rem;
+    text-align: center; /* Center the text */
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 800px; /* Limit the width of the text content */
+}
+
+/* Grid layout for side-by-side charts */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 2rem;
+    max-width: 100%;
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr; /* Stack items vertically on small screens */
+    }
+}
+
+h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+/* Ensure equal width for each card’s visuals */
+#map2, #weeklygap {
+    width: 100%; /* Full width within card */
+    height: 350px; /* Adjust this value as needed */
+}
+
+
+
+/* Section 4 styling */
+/* Main section styling for Section 4 */
+.section4 {
+    height: auto;
+    margin: 0 auto;
+    background-color: #f2ebdf; /* Match background color to Section 3 */
+    padding-bottom: 2rem; /* Add padding at the bottom */
+}
+
+/* Constrain the content width */
+.section4 .inner-container {
+    max-width: 80vmax; /* Limit the content width */
+    margin: 0 auto; /* Center the content */
+}
+
+/* Styling for the title */
+.section4 h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #111827;
+    margin-bottom: 2rem;
+    text-align: center; /* Center the title */
+}
+
+/* Card styling (consistent with Section 3) */
+.section4 .card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    display: block;
+    width : 1210px;/* Ensure the card takes up the full available width */
+    margin-left: auto; /* Center the cards */
+    margin-right: auto; /* Center the cards */
+}
+
+/* Card body styling */
+.section4 .card-body {
+    padding: 1.5rem;
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* Text content styling for explanation cards */
+.section4 .text-content {
+    color: #4b5563;
+    font-size: 1.125rem;
+    text-align: center; /* Center the text */
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 800px; /* Limit the width of the text content */
+}
+
+
+
+.section5 {
+    background-color: #4a617d;
+}
